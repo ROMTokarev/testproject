@@ -1,0 +1,41 @@
+# FOSUser
+fos_user:
+  db_driver: orm
+  firewall_name: main
+  user_class: App\Entity\Users
+  service:
+    mailer: fos_user.mailer.twig_swift
+  from_email:
+    address: '%env(resolve:MAILER_USER)%'
+    sender_name: '%env(resolve:MAILER_USER)%'
+
+old_sound_rabbit_mq:
+  connections:
+    default:
+      host:     'localhost'
+      port:     5672
+      user:     'guest'
+      password: 'guest'
+      vhost:    '/'
+      lazy:     false
+      connection_timeout: 3
+      read_write_timeout: 3
+
+      # requires php-amqplib v2.4.1+ and PHP5.4+
+      keepalive: false
+
+      # requires php-amqplib v2.4.1+
+      heartbeat: 0
+
+      #requires php_sockets.dll
+      use_socket: true # default false
+  producers:
+    api:
+      connection:       default
+      exchange_options: {name: 'api', type: direct}
+  consumers:
+    api:
+      connection:       default
+      exchange_options: {name: 'api', type: direct}
+      queue_options:    {name: 'api'}
+      callback:         app.consumer.api_service
